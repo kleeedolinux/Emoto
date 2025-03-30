@@ -97,7 +97,8 @@ const DEFAULT_ACHIEVEMENT_DATA: AchievementData = {
     totalCorrectGuesses: 0,
     bestScore: 0,
     totalGames: 0,
-    channelGuesses: {}
+    channelGuesses: {},
+    guessedEmotes: {}
   }
 };
 
@@ -227,12 +228,16 @@ export function incrementCorrectGuesses(): Achievement[] {
   return newlyUnlocked;
 }
 
-export function incrementChannelGuess(channel: string): Achievement[] {
+export function incrementChannelGuess(channel: string, emoteName: string): Achievement[] {
   const data = getAchievementData();
   const lowerCaseChannel = channel.toLowerCase();
   
   if (!data.stats.channelGuesses) {
     data.stats.channelGuesses = {};
+  }
+  
+  if (!data.stats.guessedEmotes) {
+    data.stats.guessedEmotes = {};
   }
   
   let shouldIncrementChannel = false;
@@ -246,6 +251,19 @@ export function incrementChannelGuess(channel: string): Achievement[] {
   if (!shouldIncrementChannel) {
     return [];
   }
+  
+  // Check if this emote has already been guessed for this channel
+  if (!data.stats.guessedEmotes[lowerCaseChannel]) {
+    data.stats.guessedEmotes[lowerCaseChannel] = [];
+  }
+  
+  // If the emote is already guessed, don't count it again
+  if (data.stats.guessedEmotes[lowerCaseChannel].includes(emoteName)) {
+    return [];
+  }
+  
+  // Add the emote to the guessed list
+  data.stats.guessedEmotes[lowerCaseChannel].push(emoteName);
   
   const channelGuesses = {
     ...data.stats.channelGuesses,
@@ -275,7 +293,8 @@ export function incrementChannelGuess(channel: string): Achievement[] {
     achievements: updatedAchievements,
     stats: {
       ...data.stats,
-      channelGuesses
+      channelGuesses,
+      guessedEmotes: data.stats.guessedEmotes
     }
   });
   

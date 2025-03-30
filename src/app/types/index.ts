@@ -38,6 +38,7 @@ export interface AchievementData {
     bestScore: number;
     totalGames: number;
     channelGuesses?: Record<string, number>;
+    guessedEmotes?: Record<string, string[]>;
   };
 }
 

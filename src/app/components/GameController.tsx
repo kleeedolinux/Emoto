@@ -294,7 +294,7 @@ export default function GameController({ children, onAchievementUnlocked }: Game
       }
       
       const unlockedAchievements = incrementCorrectGuesses();
-      const channelUnlockedAchievements = incrementChannelGuess(gameState.channel);
+      const channelUnlockedAchievements = incrementChannelGuess(gameState.channel, currentEmote.name);
       const allUnlockedAchievements = [...unlockedAchievements, ...channelUnlockedAchievements];
       
       if (allUnlockedAchievements.length > 0) {
