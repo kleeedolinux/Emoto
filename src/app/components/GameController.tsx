@@ -8,7 +8,7 @@ import { fetchEmotes, getRandomEmote, checkGuess, getEmoteNames, removeEmote, Em
 import { playSound, startAlarmSound, stopAlarmSound, testAlarm } from '../utils/soundManager';
 import { Emote, Achievement } from '../types';
 import { EmoteInputHandles } from './EmoteInput';
-import { incrementCorrectGuesses, incrementTotalGames, updateBestScore } from '../utils/achievementManager';
+import { incrementCorrectGuesses, incrementChannelGuess, incrementTotalGames, updateBestScore } from '../utils/achievementManager';
 import { ErrorType } from './ErrorPopup';
 
 interface GameControllerProps {
@@ -294,8 +294,11 @@ export default function GameController({ children, onAchievementUnlocked }: Game
       }
       
       const unlockedAchievements = incrementCorrectGuesses();
-      if (unlockedAchievements.length > 0) {
-        unlockedAchievements.forEach(achievement => {
+      const channelUnlockedAchievements = incrementChannelGuess(gameState.channel);
+      const allUnlockedAchievements = [...unlockedAchievements, ...channelUnlockedAchievements];
+      
+      if (allUnlockedAchievements.length > 0) {
+        allUnlockedAchievements.forEach(achievement => {
           handleAchievementUnlocked(achievement);
         });
       }

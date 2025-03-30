@@ -156,6 +156,10 @@
       "immortal": {
         "title": "Emote Immortal",
         "description": "Guess 1000 emotes. You're an emote deity!"
+      },
+      "o_incidente": {
+        "title": "O Incidente",
+        "description": "Guess 15 emotes from O Incidente group channels (cereaw, grifoexe, eo_chara, tinymigs, akkaiverso)"
       }
     }
   }

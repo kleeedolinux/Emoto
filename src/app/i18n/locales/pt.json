@@ -156,6 +156,10 @@
       "immortal": {
         "title": "Imortal dos Emotes",
         "description": "Adivinhe 1000 emotes. Você é uma divindade dos emotes!"
+      },
+      "o_incidente": {
+        "title": "O Incidente",
+        "description": "Adivinhe 15 emotes do grupo O Incidente (cereaw, grifoexe, eo_chara, tinymigs, akkaiverso)"
       }
     }
   }

@@ -28,6 +28,7 @@ export interface Achievement {
   requirement: number;
   icon: string;
   unlocked: boolean;
+  channels?: string[];
 }
 
 export interface AchievementData {
@@ -36,6 +37,7 @@ export interface AchievementData {
     totalCorrectGuesses: number;
     bestScore: number;
     totalGames: number;
+    channelGuesses?: Record<string, number>;
   };
 }
 

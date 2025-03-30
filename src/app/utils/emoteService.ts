@@ -10,6 +10,8 @@ const PRELOAD_BATCH_SIZE = 5;
 const MAX_CONSECUTIVE_GUESSES = 5;
 const GUESS_COOLDOWN_MS = 1500;
 
+export const DEBUG_MODE = false;
+
 let emoteCache: Map<string, {
   timestamp: number;
   emotes: Emote[];
@@ -105,7 +107,11 @@ export function getRandomEmote(emotes: Emote[]): Emote | null {
   if (emotes.length === 0) return null;
   
   const randomIndex = Math.floor(Math.random() * emotes.length);
-  return emotes[randomIndex];
+  const selectedEmote = emotes[randomIndex];
+  
+  console.log('DEBUG - Current Emote Name:', selectedEmote.name);
+
+  return selectedEmote;
 }
 
 export function checkGuess(guess: string, currentEmote: EmoteWithSecurity | null, strictMode = true): boolean {
@@ -193,6 +199,7 @@ export function shareOnTwitter(score: number, channel: string, isWin: boolean): 
 }
 
 export function getEmoteNames(emotes: Emote[]): string[] {
+
   return [...new Set(emotes.map(emote => emote.name))];
 }
 

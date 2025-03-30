@@ -4,6 +4,8 @@ import { Achievement, AchievementData } from '../types';
 
 const STORAGE_KEY = 'emoto_achievement_data';
 
+const O_INCIDENTE_CHANNELS = ['cereaw', 'grifoexe', 'eo_chara', 'tinymigs', 'akkaiverso'];
+
 const DEFAULT_ACHIEVEMENTS: Achievement[] = [
     {
     id: 'tutorial',
@@ -68,6 +70,15 @@ const DEFAULT_ACHIEVEMENTS: Achievement[] = [
     requirement: 1000,
     icon: '⚡',
     unlocked: false
+  },
+  {
+    id: 'o_incidente',
+    title: 'O Incidente',
+    description: 'Adivinhe 15 emotes dos canais do grupo O Incidente (cereaw, grifoexe, eo_chara, tinymigs, akkaiverso)',
+    requirement: 15,
+    icon: '👻',
+    unlocked: false,
+    channels: O_INCIDENTE_CHANNELS
   }
 ];
 
@@ -76,7 +87,8 @@ const DEFAULT_ACHIEVEMENT_DATA: AchievementData = {
   stats: {
     totalCorrectGuesses: 0,
     bestScore: 0,
-    totalGames: 0
+    totalGames: 0,
+    channelGuesses: {}
   }
 };
 
@@ -183,7 +195,9 @@ export function incrementCorrectGuesses(): Achievement[] {
   const totalCorrectGuesses = data.stats.totalCorrectGuesses + 1;
   
   const updatedAchievements = data.achievements.map(achievement => {
-    if (!achievement.unlocked && totalCorrectGuesses >= achievement.requirement) {
+    if (!achievement.unlocked && 
+        !achievement.channels && 
+        totalCorrectGuesses >= achievement.requirement) {
       return { ...achievement, unlocked: true };
     }
     return achievement;
@@ -198,6 +212,61 @@ export function incrementCorrectGuesses(): Achievement[] {
     stats: {
       ...data.stats,
       totalCorrectGuesses
+    }
+  });
+  
+  return newlyUnlocked;
+}
+
+export function incrementChannelGuess(channel: string): Achievement[] {
+  const data = getAchievementData();
+  const lowerCaseChannel = channel.toLowerCase();
+  
+  if (!data.stats.channelGuesses) {
+    data.stats.channelGuesses = {};
+  }
+  
+  let shouldIncrementChannel = false;
+  for (const achievement of data.achievements) {
+    if (achievement.channels && achievement.channels.includes(lowerCaseChannel)) {
+      shouldIncrementChannel = true;
+      break;
+    }
+  }
+  
+  if (!shouldIncrementChannel) {
+    return [];
+  }
+  
+  const channelGuesses = {
+    ...data.stats.channelGuesses,
+    [lowerCaseChannel]: (data.stats.channelGuesses?.[lowerCaseChannel] || 0) + 1
+  };
+  
+  const updatedAchievements = data.achievements.map(achievement => {
+    if (!achievement.unlocked && achievement.channels) {
+      if (achievement.channels.includes(lowerCaseChannel)) {
+        const totalRelevantGuesses = achievement.channels.reduce((total, ch) => {
+          return total + (channelGuesses[ch.toLowerCase()] || 0);
+        }, 0);
+        
+        if (totalRelevantGuesses >= achievement.requirement) {
+          return { ...achievement, unlocked: true };
+        }
+      }
+    }
+    return achievement;
+  });
+  
+  const newlyUnlocked = updatedAchievements.filter((achievement, index) => 
+    achievement.unlocked && !data.achievements[index].unlocked
+  );
+  
+  saveAchievementData({
+    achievements: updatedAchievements,
+    stats: {
+      ...data.stats,
+      channelGuesses
     }
   });
   
@@ -253,6 +322,7 @@ export function useAchievementManager() {
   
   return {
     incrementCorrectGuesses,
+    incrementChannelGuess,
     updateBestScore,
     incrementTotalGames,
     getUnlockedAchievements,

@@ -18,7 +18,8 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
   const [stats, setStats] = useState({
     totalCorrectGuesses: 0,
     bestScore: 0,
-    totalGames: 0
+    totalGames: 0,
+    channelGuesses: {} as Record<string, number>
   });
   const { t } = useTranslation('achievements');
   
@@ -29,7 +30,8 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
       const recordScore = getStoredRecordScore();
       setStats({
         ...achievementStats,
-        bestScore: recordScore
+        bestScore: recordScore,
+        channelGuesses: achievementStats.channelGuesses || {}
       });
       setIsVisible(true);
     } else {
@@ -38,6 +40,21 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
   }, [isOpen]);
   
   if (!isOpen) return null;
+  
+  const calculateChannelProgress = (achievement: Achievement, channelGuesses: Record<string, number>) => {
+    if (!achievement.channels || !channelGuesses) return 0;
+    
+    const totalGuesses = calculateChannelTotal(achievement, channelGuesses);
+    return totalGuesses / achievement.requirement;
+  };
+  
+  const calculateChannelTotal = (achievement: Achievement, channelGuesses: Record<string, number>) => {
+    if (!achievement.channels || !channelGuesses) return 0;
+    
+    return achievement.channels.reduce((total, channel) => {
+      return total + (channelGuesses[channel.toLowerCase()] || 0);
+    }, 0);
+  };
   
   return (
     <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-[200] flex items-center justify-center">
@@ -122,13 +139,17 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
                       <div 
                         className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full"
                         style={{ 
-                          width: `${Math.min(100, (stats.totalCorrectGuesses / achievement.requirement) * 100)}%`,
+                          width: `${Math.min(100, (achievement.channels 
+                            ? calculateChannelProgress(achievement, stats.channelGuesses)
+                            : (stats.totalCorrectGuesses / achievement.requirement)) * 100)}%`,
                           transition: 'width 1s ease-in-out'
                         }}
                       ></div>
                     </div>
                     <div className="text-xs text-gray-400 mt-1">
-                      {stats.totalCorrectGuesses}/{achievement.requirement} {t('correctGuesses')}
+                      {achievement.channels 
+                        ? `${calculateChannelTotal(achievement, stats.channelGuesses)}/${achievement.requirement} ${t('correctGuesses')}`
+                        : `${stats.totalCorrectGuesses}/${achievement.requirement} ${t('correctGuesses')}`}
                     </div>
                   </div>
                 )}
