@@ -142,17 +142,46 @@ export function getAchievementData(): AchievementData {
     const filteredAchievements = parsedData.achievements
       .filter(a => defaultAchievementIds.includes(a.id));
     
-    const needsUpdate = achievementsToAdd.length > 0 || filteredAchievements.length !== parsedData.achievements.length;
+    let needsMigration = false;
+    if (parsedData.stats.guessedEmotes) {
+      if (!parsedData.stats.guessedEmotes['all']) {
+        needsMigration = true;
+      }
+    }
+    
+    const needsUpdate = achievementsToAdd.length > 0 || 
+                        filteredAchievements.length !== parsedData.achievements.length ||
+                        needsMigration;
     
     if (needsUpdate) {
       const updatedAchievements = [...filteredAchievements, ...achievementsToAdd];
+      
+      let migratedGuessedEmotes: Record<string, string[]> = { 
+        all: [] 
+      };
+      
+      if (parsedData.stats.guessedEmotes && needsMigration) {
+        for (const channelKey in parsedData.stats.guessedEmotes) {
+          if (channelKey === 'all') continue;
+          
+          const emotes = parsedData.stats.guessedEmotes[channelKey];
+          if (Array.isArray(emotes)) {
+            for (const emoteName of emotes) {
+              migratedGuessedEmotes.all.push(`${channelKey}:${emoteName}`);
+            }
+          }
+        }
+      } else if (parsedData.stats.guessedEmotes) {
+        migratedGuessedEmotes = parsedData.stats.guessedEmotes;
+      }
       
       const updatedData = {
         ...parsedData,
         achievements: updatedAchievements,
         stats: {
           ...DEFAULT_ACHIEVEMENT_DATA.stats,
-          ...parsedData.stats
+          ...parsedData.stats,
+          guessedEmotes: migratedGuessedEmotes
         }
       };
       
@@ -252,18 +281,17 @@ export function incrementChannelGuess(channel: string, emoteName: string): Achie
     return [];
   }
   
-  // Check if this emote has already been guessed for this channel
-  if (!data.stats.guessedEmotes[lowerCaseChannel]) {
-    data.stats.guessedEmotes[lowerCaseChannel] = [];
+  const emoteKey = `${lowerCaseChannel}:${emoteName}`;
+  
+  if (!data.stats.guessedEmotes['all']) {
+    data.stats.guessedEmotes['all'] = [];
   }
   
-  // If the emote is already guessed, don't count it again
-  if (data.stats.guessedEmotes[lowerCaseChannel].includes(emoteName)) {
+  if (data.stats.guessedEmotes['all'].includes(emoteKey)) {
     return [];
   }
   
-  // Add the emote to the guessed list
-  data.stats.guessedEmotes[lowerCaseChannel].push(emoteName);
+  data.stats.guessedEmotes['all'].push(emoteKey);
   
   const channelGuesses = {
     ...data.stats.channelGuesses,
