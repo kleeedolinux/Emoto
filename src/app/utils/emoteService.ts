@@ -5,7 +5,7 @@ import { normalizeString } from './normalizeString';
 
 const API_ENDPOINT = 'https://emotes.crippled.dev/v1/channel';
 const CACHE_EXPIRY = 1000 * 60 * 60; 
-const REQUEST_TIMEOUT = 5000;
+const REQUEST_TIMEOUT = 10000;
 const PRELOAD_BATCH_SIZE = 5;
 const MAX_CONSECUTIVE_GUESSES = 900;
 const GUESS_COOLDOWN_MS = 1500;
@@ -23,6 +23,7 @@ let loadingImages: Set<string> = new Set();
 let normalizedNameCache: Map<string, string> = new Map();
 let lastGuessTime: number = 0;
 let consecutiveGuesses: number = 0;
+let failedEmotes: Set<string> = new Set();
 
 export interface EmoteWithSecurity extends Emote {
   securityToken?: string;
@@ -90,8 +91,6 @@ export async function fetchEmotes(channel: string): Promise<EmoteResponse> {
       channelId
     });
     
-    batchPreloadImages(processedEmotes.slice(0, 20));
-    
     return { 
       emotes: processedEmotes, 
       channelId, 
@@ -106,10 +105,33 @@ export async function fetchEmotes(channel: string): Promise<EmoteResponse> {
 export function getRandomEmote(emotes: Emote[]): Emote | null {
   if (emotes.length === 0) return null;
   
-  const randomIndex = Math.floor(Math.random() * emotes.length);
-  const selectedEmote = emotes[randomIndex];
+  if (typeof window !== 'undefined') {
+    const storedFailedEmotes = window.localStorage.getItem('failedEmotes') || '';
+    const storedFailedSet = new Set(storedFailedEmotes.split(',').filter(Boolean));
+    
+    storedFailedSet.forEach(url => failedEmotes.add(url));
+  }
+  
+  const validEmotes = emotes.filter(emote => !failedEmotes.has(emote.url));
+  
+ if (validEmotes.length === 0) {
+    if (DEBUG_MODE) {
+      console.log('All emotes previously failed, resetting failed list');
+    }
+    failedEmotes.clear();
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('failedEmotes');
+    }
+    
+    const limitedEmotes = emotes.slice(0, Math.min(emotes.length, 20));
+    const randomIndex = Math.floor(Math.random() * limitedEmotes.length);
+    return limitedEmotes[randomIndex];
+  }
+  
+  const randomIndex = Math.floor(Math.random() * validEmotes.length);
+  const selectedEmote = validEmotes[randomIndex];
   if (DEBUG_MODE) {
-  console.log('DEBUG - Current Emote Name:', selectedEmote.name);
+    console.log('DEBUG - Current Emote Name:', selectedEmote.name);
   }
   return selectedEmote;
 }
@@ -204,6 +226,12 @@ export function getEmoteNames(emotes: Emote[]): string[] {
 }
 
 export function processEmotes(rawEmotes: any[]): Emote[] {
+  let localFailedEmotes = new Set<string>();
+  if (typeof window !== 'undefined') {
+    const storedFailedEmotes = window.localStorage.getItem('failedEmotes') || '';
+    localFailedEmotes = new Set(storedFailedEmotes.split(',').filter(Boolean));
+  }
+
   return rawEmotes
     .filter(emote => {
       return emote && 
@@ -229,7 +257,7 @@ export function processEmotes(rawEmotes: any[]): Emote[] {
         securityToken
       };
     })
-    .filter(emote => emote.url !== '');
+    .filter(emote => emote.url !== '' && !localFailedEmotes.has(emote.url));
 }
 
 function generateSecurityToken(emoteName: string): string {
@@ -250,34 +278,35 @@ export function verifyEmoteIntegrity(emote: EmoteWithSecurity | null): boolean {
   }
 }
 
-function batchPreloadImages(emotes: Emote[]): void {
-  if (emotes.length === 0) return;
-  
-  const processBatch = (startIndex: number) => {
-    const batch = emotes.slice(startIndex, startIndex + PRELOAD_BATCH_SIZE);
-    batch.forEach(emote => preloadImage(emote.url));
-    
-    if (startIndex + PRELOAD_BATCH_SIZE < emotes.length) {
-      setTimeout(() => processBatch(startIndex + PRELOAD_BATCH_SIZE), 100);
-    }
-  };
-  
-  processBatch(0);
-}
-
 function preloadImage(url: string): void {
   if (imageCache.has(url) || loadingImages.has(url)) return;
+  if (failedEmotes.has(url)) return;
   
   loadingImages.add(url);
   
   const img = new Image();
+  const timeoutId = setTimeout(() => {
+    if (loadingImages.has(url)) {
+      loadingImages.delete(url);
+      img.src = ''; 
+      failedEmotes.add(url);
+      console.log(`Skipped emote loading after timeout: ${url}`);
+    }
+  }, REQUEST_TIMEOUT);
+  
   img.onload = () => {
+    clearTimeout(timeoutId);
     imageCache.set(url, img);
     loadingImages.delete(url);
   };
+  
   img.onerror = () => {
+    clearTimeout(timeoutId);
     loadingImages.delete(url);
+    failedEmotes.add(url);
+    console.log(`Skipped emote loading due to error: ${url}`);
   };
+  
   img.src = url;
 }
 
@@ -286,6 +315,11 @@ export function clearCache(): void {
   imageCache.clear();
   loadingImages.clear();
   normalizedNameCache.clear();
+  failedEmotes.clear();
   lastGuessTime = 0;
   consecutiveGuesses = 0;
+  
+  if (typeof window !== 'undefined') {
+    window.localStorage.removeItem('failedEmotes');
+  }
 } 

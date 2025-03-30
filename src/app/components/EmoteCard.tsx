@@ -13,10 +13,21 @@ interface EmoteCardProps {
 export default function EmoteCard({ emote, style = {} }: EmoteCardProps) {
   const [isHovering, setIsHovering] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [useDirectImage, setUseDirectImage] = useState(false);
   const networkStatus = useNetworkStatus();
 
   const handleImageError = () => {
-    setImageError(true);
+    if (!useDirectImage) {
+      setUseDirectImage(true);
+    } else {
+      setImageError(true);
+      if (typeof window !== 'undefined') {
+        const failedEmotes = window.localStorage.getItem('failedEmotes') || '';
+        const failedSet = new Set(failedEmotes.split(',').filter(Boolean));
+        failedSet.add(emote.url);
+        window.localStorage.setItem('failedEmotes', Array.from(failedSet).join(','));
+      }
+    }
   };
 
   return (
@@ -36,6 +47,20 @@ export default function EmoteCard({ emote, style = {} }: EmoteCardProps) {
             </svg>
             <p>Imagem não disponível</p>
           </div>
+        ) : useDirectImage ? (
+          <img
+            className="cardImage"
+            src={emote.url}
+            alt="Emote"
+            width={128}
+            height={128}
+            onError={handleImageError}
+            style={{
+              transform: isHovering ? 'scale(1.1)' : 'scale(1)',
+              transition: 'transform 0.3s ease-in-out',
+              ...style
+            }}
+          />
         ) : (
           <Image
             className="cardImage"
