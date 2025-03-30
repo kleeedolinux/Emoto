@@ -127,6 +127,7 @@ export function getAchievementData(): AchievementData {
     
     const storedData = localStorage.getItem(STORAGE_KEY);
     if (!storedData) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_ACHIEVEMENT_DATA));
       return DEFAULT_ACHIEVEMENT_DATA;
     }
     
@@ -143,10 +144,11 @@ export function getAchievementData(): AchievementData {
       .filter(a => defaultAchievementIds.includes(a.id));
     
     let needsMigration = false;
-    if (parsedData.stats.guessedEmotes) {
-      if (!parsedData.stats.guessedEmotes['all']) {
-        needsMigration = true;
-      }
+    if (!parsedData.stats.guessedEmotes) {
+      parsedData.stats.guessedEmotes = {};
+      needsMigration = true;
+    } else if (!parsedData.stats.guessedEmotes['all']) {
+      needsMigration = true;
     }
     
     const needsUpdate = achievementsToAdd.length > 0 || 
@@ -198,6 +200,7 @@ export function getAchievementData(): AchievementData {
     };
   } catch (error) {
     console.error('Error retrieving achievement data from localStorage:', error);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_ACHIEVEMENT_DATA));
     return DEFAULT_ACHIEVEMENT_DATA;
   }
 }
@@ -214,13 +217,23 @@ export function saveAchievementData(data: Partial<AchievementData>): void {
     }
     
     const currentData = getAchievementData();
+    
+    const updatedStats = {
+      ...currentData.stats,
+      ...(data.stats || {})
+    };
+    
+    if (data.stats?.guessedEmotes) {
+      updatedStats.guessedEmotes = {
+        ...currentData.stats.guessedEmotes,
+        ...data.stats.guessedEmotes
+      };
+    }
+    
     const updatedData = { 
       ...currentData, 
       ...data,
-      stats: {
-        ...currentData.stats,
-        ...(data.stats || {})
-      }
+      stats: updatedStats
     };
     
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
@@ -291,7 +304,10 @@ export function incrementChannelGuess(channel: string, emoteName: string): Achie
     return [];
   }
   
-  data.stats.guessedEmotes['all'].push(emoteKey);
+  const updatedGuessedEmotes = {
+    ...data.stats.guessedEmotes,
+    all: [...data.stats.guessedEmotes['all'], emoteKey]
+  };
   
   const channelGuesses = {
     ...data.stats.channelGuesses,
@@ -322,7 +338,7 @@ export function incrementChannelGuess(channel: string, emoteName: string): Achie
     stats: {
       ...data.stats,
       channelGuesses,
-      guessedEmotes: data.stats.guessedEmotes
+      guessedEmotes: updatedGuessedEmotes
     }
   });
   
