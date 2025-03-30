@@ -10,7 +10,7 @@ const PRELOAD_BATCH_SIZE = 5;
 const MAX_CONSECUTIVE_GUESSES = 900;
 const GUESS_COOLDOWN_MS = 1500;
 
-export const DEBUG_MODE = true;
+export const DEBUG_MODE = false;
 
 let emoteCache: Map<string, {
   timestamp: number;
