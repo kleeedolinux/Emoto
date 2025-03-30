@@ -11,6 +11,11 @@
     "error": "Error",
     "success": "Success"
   },
+  "metadata": {
+    "title": "Emoto - Twitch Emote Guessing Game",
+    "description": "Guess Twitch emotes from your favorite streamer's channel in this fun guessing game!",
+    "keywords": "Twitch, emotes, game, emote guessing, BTTV, 7TV, Twitch emotes, streaming"
+  },
   "header": {
     "help": "Help",
     "achievements": "Achievements",

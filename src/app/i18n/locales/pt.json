@@ -11,6 +11,11 @@
     "error": "Erro",
     "success": "Sucesso"
   },
+  "metadata": {
+    "title": "Emoto - Jogo de Adivinhação de Emotes da Twitch",
+    "description": "Adivinhe emotes da Twitch do canal do seu streamer favorito neste divertido jogo de adivinhação!",
+    "keywords": "Twitch, emotes, jogo, adivinhação de emotes, BTTV, 7TV, emotes da Twitch, streaming"
+  },
   "header": {
     "help": "Ajuda",
     "achievements": "Conquistas",
