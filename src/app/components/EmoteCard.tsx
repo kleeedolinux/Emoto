@@ -44,7 +44,6 @@ export default function EmoteCard({ emote, style = {} }: EmoteCardProps) {
             width={128}
             height={128}
             priority={true}
-            unoptimized={true}
             loading="eager"
             fetchPriority="high"
             decoding="async"

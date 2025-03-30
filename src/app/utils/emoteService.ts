@@ -108,9 +108,9 @@ export function getRandomEmote(emotes: Emote[]): Emote | null {
   
   const randomIndex = Math.floor(Math.random() * emotes.length);
   const selectedEmote = emotes[randomIndex];
-  
+  if (DEBUG_MODE) {
   console.log('DEBUG - Current Emote Name:', selectedEmote.name);
-
+  }
   return selectedEmote;
 }
 
