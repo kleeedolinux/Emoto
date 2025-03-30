@@ -20,12 +20,16 @@ import AchievementsDialog from './components/AchievementsDialog';
 import { AchievementNotificationContainer } from './components/AchievementNotification';
 import { Achievement } from './types';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
+import OfflineAlert from './components/OfflineAlert';
+import { useNetworkStatus } from './utils/networkManager';
 
 export default function Home() {
   const emoteInputRef = useRef<EmoteInputHandles>(null);
   const [hasCheckedFirstTime, setHasCheckedFirstTime] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 768);
+  const [showOfflineAlert, setShowOfflineAlert] = useState(false);
+  const networkStatus = useNetworkStatus();
   
   useEffect(() => {
     const handleResize = () => {
@@ -39,6 +43,16 @@ export default function Home() {
   useEffect(() => {
     initSounds();
   }, []);
+
+  useEffect(() => {
+    if (networkStatus === 'offline') {
+      setShowOfflineAlert(true);
+    }
+  }, [networkStatus]);
+
+  const handleOfflineAlertClose = () => {
+    setShowOfflineAlert(false);
+  };
 
   return (
     <AchievementNotificationContainer>
@@ -60,6 +74,7 @@ export default function Home() {
               modalState,
               isLoading,
               invalidChannel,
+              errorType,
               handleChannelSubmit, 
               handleEmoteGuess, 
               handleRetry, 
@@ -131,6 +146,7 @@ export default function Home() {
                           onChannelSubmit={handleChannelSubmit}
                           isLoading={isLoading}
                           invalidChannel={invalidChannel}
+                          errorType={errorType}
                         />
                         
                         {recordScore > 0 && (
@@ -227,6 +243,8 @@ export default function Home() {
                     isOpen={modalState.achievementsDialogOpen}
                     onClose={closeAchievementsDialog}
                   />
+                  
+                  {showOfflineAlert && <OfflineAlert onClose={handleOfflineAlertClose} />}
                   
                   <Footer />
                 </main>

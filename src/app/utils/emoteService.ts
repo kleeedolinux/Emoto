@@ -13,6 +13,7 @@ const GUESS_COOLDOWN_MS = 1500;
 let emoteCache: Map<string, {
   timestamp: number;
   emotes: Emote[];
+  channelId?: string;
 }> = new Map();
 
 let imageCache: Map<string, HTMLImageElement> = new Map();
@@ -25,14 +26,24 @@ export interface EmoteWithSecurity extends Emote {
   securityToken?: string;
 }
 
-export async function fetchEmotes(channel: string): Promise<Emote[]> {
+export interface EmoteResponse {
+  emotes: Emote[];
+  channelId: string;
+  channelName: string;
+}
+
+export async function fetchEmotes(channel: string): Promise<EmoteResponse> {
   if (!channel.trim()) {
-    return [];
+    return { emotes: [], channelId: '', channelName: '' };
   }
 
   const cached = emoteCache.get(channel);
   if (cached && Date.now() - cached.timestamp < CACHE_EXPIRY) {
-    return cached.emotes;
+    return { 
+      emotes: cached.emotes, 
+      channelId: cached.channelId || '', 
+      channelName: channel 
+    };
   }
 
   try {
@@ -46,7 +57,7 @@ export async function fetchEmotes(channel: string): Promise<Emote[]> {
     
     if (!channelId || channelId.includes('User not found')) {
       clearTimeout(timeoutId);
-      return [];
+      return { emotes: [], channelId: '', channelName: channel };
     }
     
     const response = await fetch(`${API_ENDPOINT}/${channel}/all`, {
@@ -73,15 +84,20 @@ export async function fetchEmotes(channel: string): Promise<Emote[]> {
     
     emoteCache.set(channel, {
       timestamp: Date.now(),
-      emotes: processedEmotes
+      emotes: processedEmotes,
+      channelId
     });
     
     batchPreloadImages(processedEmotes.slice(0, 20));
     
-    return processedEmotes;
+    return { 
+      emotes: processedEmotes, 
+      channelId, 
+      channelName: channel 
+    };
   } catch (error) {
     console.error('Error fetching emotes:', error);
-    return [];
+    return { emotes: [], channelId: '', channelName: channel };
   }
 }
 

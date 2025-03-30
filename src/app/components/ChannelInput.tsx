@@ -1,17 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ErrorPopup, ErrorType } from './ErrorPopup';
+import { useNetworkStatus } from '../utils/networkManager';
 
 interface ChannelInputProps {
   onChannelSubmit: (channel: string, challengeMode: string, timeLimit?: number) => void;
   isLoading: boolean;
   invalidChannel: boolean;
+  errorType?: ErrorType;
 }
 
 export default function ChannelInput({ 
   onChannelSubmit, 
   isLoading, 
-  invalidChannel 
+  invalidChannel,
+  errorType: propErrorType = 'invalid_channel'
 }: ChannelInputProps) {
   const [channel, setChannel] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -19,20 +23,53 @@ export default function ChannelInput({
   const [challengeMode, setChallengeMode] = useState('normal');
   const [showChallengeSelector, setShowChallengeSelector] = useState(false);
   const [timeLimit, setTimeLimit] = useState(20);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorType, setErrorType] = useState<ErrorType>('invalid_channel');
+  const networkStatus = useNetworkStatus();
 
   useEffect(() => {
     if (invalidChannel) {
       setAnimateShake(true);
+      setErrorType(propErrorType);
+      setShowErrorPopup(true);
       const timer = setTimeout(() => {
         setAnimateShake(false);
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [invalidChannel]);
+  }, [invalidChannel, propErrorType]);
+
+  useEffect(() => {
+    if (networkStatus === 'offline') {
+      setErrorType('offline');
+      setShowErrorPopup(true);
+    }
+  }, [networkStatus]);
+
+  const validateChannel = (value: string) => {
+    const invalidCharsRegex = /[^a-zA-Z0-9_]/;
+    if (value.trim() && invalidCharsRegex.test(value)) {
+      setErrorType('invalid_chars');
+      setShowErrorPopup(true);
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (networkStatus === 'offline') {
+      setErrorType('offline');
+      setShowErrorPopup(true);
+      return;
+    }
+    
     if (channel.trim() && !isLoading) {
+      if (!validateChannel(channel)) {
+        return;
+      }
+
       onChannelSubmit(
         channel.trim(), 
         challengeMode, 
@@ -48,8 +85,19 @@ export default function ChannelInput({
     }
   };
 
+  const handleChannelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setChannel(e.target.value);
+    if (e.target.value.trim()) {
+      validateChannel(e.target.value);
+    }
+  };
+
   const toggleChallengeSelector = () => {
     setShowChallengeSelector(prev => !prev);
+  };
+
+  const handleCloseError = () => {
+    setShowErrorPopup(false);
   };
 
   return (
@@ -61,7 +109,7 @@ export default function ChannelInput({
             className={`channelInput ${isLoading ? 'loading-state' : ''} ${animateShake ? 'shake' : ''}`}
             placeholder={isLoading ? "Carregando..." : "Insira um canal da Twitch"}
             value={channel}
-            onChange={(e) => setChannel(e.target.value)}
+            onChange={handleChannelChange}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
@@ -203,11 +251,12 @@ export default function ChannelInput({
       </form>
       <p className="subtitle2">sério, qualquer um.</p>
       
-      {invalidChannel && (
-        <div className="invalidChannel" style={{ animation: 'shake 0.5s' }}>
-          Canal inválido ou sem emotes
-        </div>
-      )}
+      {/* Error popup */}
+      <ErrorPopup 
+        isVisible={showErrorPopup}
+        errorType={errorType}
+        onClose={handleCloseError}
+      />
       
       {isLoading && (
         <div className="loading">

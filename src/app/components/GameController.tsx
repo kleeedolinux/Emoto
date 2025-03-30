@@ -4,11 +4,12 @@ import { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import { useGameStateManager } from '../utils/gameStateManager';
 import { useLivesManager } from '../utils/livesManager';
 import { useModalManager } from '../utils/modalManager';
-import { fetchEmotes, checkGuess, getEmoteNames } from '../utils/emoteService';
+import { fetchEmotes, getRandomEmote, checkGuess, getEmoteNames, removeEmote, EmoteResponse } from '../utils/emoteService';
 import { playSound, startAlarmSound, stopAlarmSound, testAlarm } from '../utils/soundManager';
 import { Emote, Achievement } from '../types';
 import { EmoteInputHandles } from './EmoteInput';
 import { incrementCorrectGuesses, incrementTotalGames, updateBestScore } from '../utils/achievementManager';
+import { ErrorType } from './ErrorPopup';
 
 interface GameControllerProps {
   children: (props: GameControllerOutput) => React.ReactNode;
@@ -30,6 +31,7 @@ interface GameControllerOutput {
   };
   isLoading: boolean;
   invalidChannel: boolean;
+  errorType: ErrorType;
   handleChannelSubmit: (channel: string, challengeMode: string, timeLimit?: number) => Promise<void>;
   handleEmoteGuess: (guess: string) => void;
   handleRetry: () => Promise<void>;
@@ -61,6 +63,8 @@ export default function GameController({ children, onAchievementUnlocked }: Game
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isLifeBeingReduced, setIsLifeBeingReduced] = useState(false);
   const [timerExpired, setTimerExpired] = useState(false);
+  const [invalidChannel, setInvalidChannel] = useState(false);
+  const [errorType, setErrorType] = useState<ErrorType>('invalid_channel');
 
   const {
     gameState,
@@ -72,7 +76,6 @@ export default function GameController({ children, onAchievementUnlocked }: Game
     initializeGame,
     updateRecordIfNeeded,
     setLoading,
-    setInvalidChannel
   } = useGameStateManager();
 
   const timePercentage = useMemo(() => {
@@ -119,8 +122,6 @@ export default function GameController({ children, onAchievementUnlocked }: Game
     stopAlarmSound();
     setLastEmote(null);
   }, [resetGame]);
-
-
 
   useEffect(() => {
     if (gameState.gameActive && (challengeMode === 'tempo' || challengeMode === 'tempodesfocado') && timeRemaining !== null) {
@@ -206,52 +207,67 @@ export default function GameController({ children, onAchievementUnlocked }: Game
   }, [onAchievementUnlocked]);
 
   const handleChannelSubmit = useCallback(async (channel: string, challengeMode: string, timeLimit?: number) => {
+    setLoading(true);
+    setInvalidChannel(false);
+    
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setErrorType('offline');
+      setInvalidChannel(true);
+      setLoading(false);
+      return;
+    }
+    
     try {
-      setLoading(true);
-      setInvalidChannel(false);
+      const response: EmoteResponse = await fetchEmotes(channel);
+      
+      if (!response.emotes || response.emotes.length === 0) {
+        setErrorType('not_found');
+        setInvalidChannel(true);
+        setLoading(false);
+        return;
+      }
+      
       setChallengeMode(challengeMode);
       setIsLifeBeingReduced(false);
       setTimerExpired(false);
-      
-      const emotes = await fetchEmotes(channel);
-      
-      setLoading(false);
-      
-      if (emotes.length === 0) {
-        setInvalidChannel(true);
-        return;
-      }
       
       resetLives();
       
       if (challengeMode === 'onelife') {
         setMaxLives(1);
-        resetLives();
-      } else {
-        setMaxLives(4);
-        resetLives();
       }
       
-      initializeGame(channel, emotes);
-      closeGameOverDialog();
-      closeWinDialog();
-
       if (challengeMode === 'tempo' || challengeMode === 'tempodesfocado') {
-        const customTimeLimit = timeLimit || 20; 
+        const customTimeLimit = timeLimit || 60;
         setInitialTime(customTimeLimit);
         setTimeRemaining(customTimeLimit);
       } else {
         setTimeRemaining(null);
         setInitialTime(0);
       }
-
-      incrementTotalGames();
+      
+      closeGameOverDialog();
+      closeWinDialog();
+      initializeGame(channel, response.emotes);
     } catch (error) {
       console.error('Error fetching emotes:', error);
-      setLoading(false);
+      if (error instanceof Error) {
+        if (error.message.includes('not found') || error.message.includes('404')) {
+          setErrorType('not_found');
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          setErrorType('offline');
+        } else {
+          setErrorType('api_error');
+        }
+      } else {
+        setErrorType('invalid_channel');
+      }
       setInvalidChannel(true);
+      setLoading(false);
     }
-  }, [initializeGame, resetLives, closeGameOverDialog, closeWinDialog, setLoading, setInvalidChannel, setMaxLives, setIsLifeBeingReduced]);
+
+    incrementTotalGames();
+  }, [initializeGame, resetLives, closeGameOverDialog, closeWinDialog, setLoading, setMaxLives, setIsLifeBeingReduced]);
 
   const handleEmoteGuess = useCallback((guess: string) => {
     const { currentEmote, consecutiveCorrect, emotes, score } = gameState;
@@ -374,7 +390,8 @@ export default function GameController({ children, onAchievementUnlocked }: Game
     livesState,
     modalState,
     isLoading: gameState.isLoading,
-    invalidChannel: gameState.invalidChannel,
+    invalidChannel,
+    errorType,
     handleChannelSubmit,
     handleEmoteGuess,
     handleRetry: async () => {
