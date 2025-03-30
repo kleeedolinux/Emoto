@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ErrorPopup, ErrorType } from './ErrorPopup';
 import { useNetworkStatus } from '../utils/networkManager';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface ChannelInputProps {
   onChannelSubmit: (channel: string, challengeMode: string, timeLimit?: number) => void;
@@ -17,6 +18,10 @@ export default function ChannelInput({
   invalidChannel,
   errorType: propErrorType = 'invalid_channel'
 }: ChannelInputProps) {
+  const { t } = useTranslation('channelInput');
+  const { t: tGame } = useTranslation('game');
+  const { t: tGeneral } = useTranslation('general');
+  
   const [channel, setChannel] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [animateShake, setAnimateShake] = useState(false);
@@ -26,6 +31,14 @@ export default function ChannelInput({
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorType, setErrorType] = useState<ErrorType>('invalid_channel');
   const networkStatus = useNetworkStatus();
+
+  const challengeModeNames = {
+    normal: t('challenges.normal'),
+    tempo: t('challenges.timed'),
+    desfocado: t('challenges.blurred'),
+    tempodesfocado: t('challenges.timedBlurred'),
+    onelife: t('challenges.oneLife')
+  };
 
   useEffect(() => {
     if (invalidChannel) {
@@ -107,7 +120,7 @@ export default function ChannelInput({
           <input 
             type="text" 
             className={`channelInput ${isLoading ? 'loading-state' : ''} ${animateShake ? 'shake' : ''}`}
-            placeholder={isLoading ? "Carregando..." : "Insira um canal da Twitch"}
+            placeholder={isLoading ? t('loading') : t('placeholder')}
             value={channel}
             onChange={handleChannelChange}
             onKeyDown={handleKeyDown}
@@ -142,7 +155,7 @@ export default function ChannelInput({
         </div>
         
         <div className="challenge-toggle" onClick={toggleChallengeSelector}>
-          <span>{showChallengeSelector ? "Esconder" : "Escolha um"} desafio</span>
+          <span>{showChallengeSelector ? t('challenges.hide') : t('challenges.choose')}</span>
           <span className="challenge-toggle-icon">{showChallengeSelector ? "▲" : "▼"}</span>
         </div>
         
@@ -159,7 +172,7 @@ export default function ChannelInput({
                   onChange={(e) => setChallengeMode(e.target.value)}
                   disabled={isLoading}
                 />
-                <label htmlFor="normal">Normal</label>
+                <label htmlFor="normal">{challengeModeNames.normal}</label>
               </div>
               
               <div className="challengeOption">
@@ -172,7 +185,7 @@ export default function ChannelInput({
                   onChange={(e) => setChallengeMode(e.target.value)}
                   disabled={isLoading}
                 />
-                <label htmlFor="tempo">Contra o Tempo</label>
+                <label htmlFor="tempo">{challengeModeNames.tempo}</label>
                 
                 {challengeMode === 'tempo' && (
                   <div className="time-selector">
@@ -186,7 +199,7 @@ export default function ChannelInput({
                       className="time-range"
                       disabled={isLoading}
                     />
-                    <div className="time-display">{timeLimit}s</div>
+                    <div className="time-display">{timeLimit}{tGame('timeRemaining')}</div>
                   </div>
                 )}
               </div>
@@ -201,7 +214,7 @@ export default function ChannelInput({
                   onChange={(e) => setChallengeMode(e.target.value)}
                   disabled={isLoading}
                 />
-                <label htmlFor="desfocado">Desfocado</label>
+                <label htmlFor="desfocado">{challengeModeNames.desfocado}</label>
               </div>
               
               <div className="challengeOption">
@@ -214,7 +227,7 @@ export default function ChannelInput({
                   onChange={(e) => setChallengeMode(e.target.value)}
                   disabled={isLoading}
                 />
-                <label htmlFor="tempodesfocado">Contra o Tempo + Desfocado</label>
+                <label htmlFor="tempodesfocado">{challengeModeNames.tempodesfocado}</label>
                 
                 {challengeMode === 'tempodesfocado' && (
                   <div className="time-selector">
@@ -228,7 +241,7 @@ export default function ChannelInput({
                       className="time-range"
                       disabled={isLoading}
                     />
-                    <div className="time-display">{timeLimit}s</div>
+                    <div className="time-display">{timeLimit}{tGame('timeRemaining')}</div>
                   </div>
                 )}
               </div>
@@ -243,34 +256,18 @@ export default function ChannelInput({
                   onChange={(e) => setChallengeMode(e.target.value)}
                   disabled={isLoading}
                 />
-                <label htmlFor="onelife">Uma Vida</label>
+                <label htmlFor="onelife">{challengeModeNames.onelife}</label>
               </div>
             </div>
           </div>
         )}
       </form>
-      <p className="subtitle2">sério, qualquer um.</p>
       
-      {/* Error popup */}
-      <ErrorPopup 
+      <ErrorPopup
         isVisible={showErrorPopup}
-        errorType={errorType}
         onClose={handleCloseError}
+        errorType={errorType}
       />
-      
-      {isLoading && (
-        <div className="loading">
-          <p className="loadingText">Carregando emotes...</p>
-          <img 
-            src="/img/loading2.webp" 
-            alt="Loading" 
-            className="loadingImage"
-          />
-          <div className="loadingBar">
-            <div className="loadingBarProgress"></div>
-          </div>
-        </div>
-      )}
     </>
   );
 } 

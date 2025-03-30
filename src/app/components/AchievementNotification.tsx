@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Achievement } from '../types';
 import { playAchievementSound } from '../utils/soundManager';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface AchievementNotificationProps {
   achievement: Achievement;
@@ -11,6 +12,7 @@ interface AchievementNotificationProps {
 
 export default function AchievementNotification({ achievement, onClose }: AchievementNotificationProps) {
   const [isVisible, setIsVisible] = useState(true);
+  const { t } = useTranslation('achievements');
   
   useEffect(() => {
     const timeout = setTimeout(() => {

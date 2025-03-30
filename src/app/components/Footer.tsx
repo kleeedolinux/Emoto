@@ -1,8 +1,12 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslation } from '../i18n/useTranslation';
+import LanguageSelector from './LanguageSelector';
 
 export default function Footer() {
+  const { t } = useTranslation('footer');
+  
   return (
     <footer className="footer">
       <div className="footerContent">
@@ -13,10 +17,11 @@ export default function Footer() {
             tabIndex={-1} 
             href="https://twitch.tv/GrifoEXE/about"
             rel="noopener noreferrer"
+            aria-label={t('altText.twitch')}
           >
             <Image 
               src="/img/Twitch.png" 
-              alt="Twitch" 
+              alt={t('altText.twitch')} 
               width={24} 
               height={24}
             />
@@ -26,11 +31,12 @@ export default function Footer() {
             tabIndex={-1} 
             href="https://www.youtube.com/@grifoexe"
             rel="noopener noreferrer"
+            aria-label={t('altText.youtube')}
           >
             <Image 
               id="youtube-img" 
               src="/img/YouTube-Play.png" 
-              alt="YouTube" 
+              alt={t('altText.youtube')} 
               width={24} 
               height={24}
             />
@@ -40,19 +46,25 @@ export default function Footer() {
             tabIndex={-1} 
             href="https://twitter.com/GrifoEXE"
             rel="noopener noreferrer"
+            aria-label={t('altText.twitter')}
           >
             <Image 
               id="twitter-img" 
               src="/img/Twitter.png" 
-              alt="Twitter" 
+              alt={t('altText.twitter')} 
               width={24} 
               height={24}
             />
           </a>
         </div>
+
+        <div className="language-selector-container">
+          <LanguageSelector minimal={true} inFooter={true} />
+        </div>
+        
         <div className="creditsContainer">
           <div className="nomeAutor">
-            por <a 
+            {t('by')} <a 
               className="autor" 
               tabIndex={-1} 
               target="_blank" 
@@ -64,7 +76,7 @@ export default function Footer() {
           </div>
           <div className="separator">|</div>
           <div className="refactorCredits">
-            Remake by <a 
+            {t('remake')} <a 
               className="refactorAuthor" 
               tabIndex={-1} 
               target="_blank" 
@@ -79,6 +91,7 @@ export default function Footer() {
             target="_blank" 
             className="forkGithub fa fa-github"
             rel="noopener noreferrer"
+            aria-label={t('altText.github')}
           ></a>
         </div>
       </div>

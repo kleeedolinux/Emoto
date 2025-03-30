@@ -1,0 +1,157 @@
+{
+  "general": {
+    "appName": "Emoto",
+    "record": "Recorde",
+    "submit": "Enviar",
+    "retry": "Tentar Novamente",
+    "home": "Início",
+    "share": "Compartilhar",
+    "close": "Fechar",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso"
+  },
+  "header": {
+    "help": "Ajuda",
+    "achievements": "Conquistas",
+    "subtitle": "um jogo sobre adivinhar emotes",
+    "challengeUpdate": "Atualização de Desafios",
+    "thinkingEmoteAlt": "Emote Pensativo"
+  },
+  "channelInput": {
+    "placeholder": "Digite o canal da Twitch",
+    "button": "Jogar",
+    "loading": "Carregando...",
+    "invalid": "Canal inválido",
+    "error": "Erro ao carregar canal",
+    "challenges": {
+      "choose": "Escolha um desafio",
+      "hide": "Esconder",
+      "normal": "Normal",
+      "timed": "Contra o Tempo",
+      "blurred": "Desfocado",
+      "timedBlurred": "Contra o Tempo + Desfocado",
+      "oneLife": "Uma Vida"
+    }
+  },
+  "game": {
+    "score": "Pontos",
+    "lives": "Vidas",
+    "emoteGuess": "Adivinhe o emote",
+    "inputPlaceholder": "Digite o nome do emote...",
+    "timeRemaining": "s"
+  },
+  "gameOver": {
+    "title": "Game Over!",
+    "score": "Sua pontuação",
+    "lastEmote": "O emote era",
+    "tryAgain": "Tentar Novamente",
+    "home": "Início",
+    "share": "Compartilhar",
+    "defeatMessage": "Derrotado pelo emote:",
+    "scoreMessages": {
+      "zero": "Tente novamente, você consegue!",
+      "low": "Bom começo! Continue tentando.",
+      "medium": "Muito bom! Você está melhorando.",
+      "high": "Impressionante! Você conhece bem os emotes.",
+      "excellent": "Incrível! Você é um expert em emotes!"
+    }
+  },
+  "win": {
+    "title": "Você ganhou!",
+    "score": "Pontuação final",
+    "home": "Início",
+    "share": "Compartilhar",
+    "congratulations": "Você venceu!"
+  },
+  "emoteInput": {
+    "placeholder": "Insira o nome do emote",
+    "correct": "Acertou!",
+    "tryAgain": "Tente novamente"
+  },
+  "footer": {
+    "by": "por",
+    "remake": "Remake por",
+    "altText": {
+      "twitch": "Twitch",
+      "youtube": "YouTube",
+      "twitter": "Twitter",
+      "github": "GitHub"
+    }
+  },
+  "help": {
+    "title": "Como Jogar",
+    "description": "Adivinhe os emotes da Twitch do canal do seu streamer favorito.",
+    "instructions": [
+      "Insira o nome do canal → o jogo carrega TODOS os emotes (BTTV + 7TV)",
+      "Um emote aparece",
+      "adivinhe o nome dele",
+      "Acertou",
+      "Você tem 3 vidas. O jogo acaba quando acabarem!"
+    ],
+    "howToPlay": "Como jogar",
+    "quickControls": "CONTROLES RÁPIDOS:",
+    "rules": "REGRAS:",
+    "gameDescription": "Emoto é um jogo de adivinhação de emotes da Twitch.",
+    "githubAlt": "GitHub",
+    "closeAlt": "Fechar",
+    "wrongGuess": "Errou",
+    "streakBonus": "3 acertos seguidos",
+    "extraLife": "vida extra",
+    "gameOverCondition": "4 erros",
+    "gameOver": "FIM DO JOGO",
+    "navigation": "navega",
+    "jump": "salto",
+    "select": "seleciona",
+    "cancel": "cancela"
+  },
+  "offline": {
+    "title": "Você está Offline",
+    "description": "Por favor, verifique sua conexão com a internet e tente novamente."
+  },
+  "achievements": {
+    "title": "Conquistas",
+    "yourAchievements": "Suas Conquistas",
+    "unlocked": "Desbloqueado!",
+    "correctGuesses": "acertos",
+    "stats": {
+      "totalCorrect": "Acertos Totais",
+      "bestScore": "Melhor Pontuação",
+      "gamesPlayed": "Jogos Jogados"
+    },
+    "items": {
+      "tutorial": {
+        "title": "Metacritic",
+        "description": "Passe pelo tutorial"
+      },
+      "beginner": {
+        "title": "Iniciante",
+        "description": "Adivinhe 5 emotes corretamente"
+      },
+      "intermediate": {
+        "title": "Emoteiro",
+        "description": "Adivinhe 25 emotes corretamente. Você já está pegando o jeito!"
+      },
+      "advanced": {
+        "title": "Entusiasta",
+        "description": "Adivinhe 50 emotes. Os emotes não têm segredos para você!"
+      },
+      "expert": {
+        "title": "Especialista",
+        "description": "Adivinhe 100 emotes. Sua habilidade é impressionante!"
+      },
+      "master": {
+        "title": "Mestre dos Emotes",
+        "description": "Adivinhe 250 emotes. Você é uma lenda do mundo dos emotes!"
+      },
+      "legend": {
+        "title": "Lenda Viva",
+        "description": "Adivinhe 500 emotes. Você transcendeu o mundo dos emotes!"
+      },
+      "immortal": {
+        "title": "Imortal dos Emotes",
+        "description": "Adivinhe 1000 emotes. Você é uma divindade dos emotes!"
+      }
+    }
+  }
+} 

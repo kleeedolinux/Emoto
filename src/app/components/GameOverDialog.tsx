@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 import { Emote } from '../types';
 import Image from 'next/image';
 import { stopAlarmSound } from '../utils/soundManager';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface GameOverDialogProps {
   isOpen: boolean;
@@ -24,6 +25,8 @@ export default function GameOverDialog({
 }: GameOverDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [animateIn, setAnimateIn] = useState(false);
+  const { t } = useTranslation('gameOver');
+  const { t: tGeneral } = useTranslation('general');
   
   useEffect(() => {
     if (isOpen && dialogRef.current && !dialogRef.current.open) {
@@ -68,11 +71,11 @@ export default function GameOverDialog({
   };
   
   const getScoreMessage = () => {
-    if (score === 0) return "Tente novamente, você consegue!";
-    if (score < 5) return "Bom começo! Continue tentando.";
-    if (score < 10) return "Muito bom! Você está melhorando.";
-    if (score < 15) return "Impressionante! Você conhece bem os emotes.";
-    return "Incrível! Você é um expert em emotes!";
+    if (score === 0) return t('scoreMessages.zero');
+    if (score < 5) return t('scoreMessages.low');
+    if (score < 10) return t('scoreMessages.medium');
+    if (score < 15) return t('scoreMessages.high');
+    return t('scoreMessages.excellent');
   };
   
   const renderDecorativeIcons = () => {
@@ -176,7 +179,7 @@ export default function GameOverDialog({
                 zIndex: 2
               }}
             >
-              Game Over!
+              {t('title')}
             </h1>
             <div style={{
               position: 'absolute',
@@ -285,7 +288,7 @@ export default function GameOverDialog({
               color: '#ff6b6b',
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
             }}>
-              Derrotado pelo emote:
+              {t('defeatMessage')}
             </p>
             
             <div style={{ 
@@ -336,7 +339,7 @@ export default function GameOverDialog({
             className="dialogTryAgainButton"
             onClick={handleTryAgainClick}
           >
-            Tente Novamente
+            {t('tryAgain')}
           </button>
           
           <div className="gameover-buttons-row">
@@ -345,7 +348,7 @@ export default function GameOverDialog({
               onClick={onShare}
             >
               <i className="fa fa-share-alt" aria-hidden="true"></i>
-              <span>Compartilhar</span>
+              <span>{tGeneral('share')}</span>
             </button>
             
             <button 
@@ -353,7 +356,7 @@ export default function GameOverDialog({
               onClick={handleHomeClick}
             >
               <i className="fa fa-home" aria-hidden="true"></i>
-              <span>Home</span>
+              <span>{tGeneral('home')}</span>
             </button>
           </div>
         </div>

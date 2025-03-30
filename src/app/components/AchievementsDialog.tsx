@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Achievement } from '../types';
 import { useAchievementManager } from '../utils/achievementManager';
 import { getStoredRecordScore } from '../utils/storageManager';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface AchievementsDialogProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
     bestScore: 0,
     totalGames: 0
   });
+  const { t } = useTranslation('achievements');
   
   useEffect(() => {
     if (isOpen) {
@@ -52,7 +54,7 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
           <div className="flex items-center gap-3">
             <span className="text-3xl" style={{ color: 'gold' }}>🏆</span>
             <h2 className="text-3xl font-bold bg-gradient-to-r from-yellow-300 to-yellow-500 text-transparent bg-clip-text">
-              Conquistas
+              {t('title')}
             </h2>
           </div>
           <button 
@@ -69,20 +71,20 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
         >
           <div className="text-center p-2 rounded-lg bg-purple-800/20">
             <div className="text-2xl font-bold">{stats.totalCorrectGuesses}</div>
-            <div className="text-xs text-purple-300">Acertos Totais</div>
+            <div className="text-xs text-purple-300">{t('stats.totalCorrect')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-blue-800/20">
             <div className="text-2xl font-bold">{stats.bestScore}</div>
-            <div className="text-xs text-blue-300">Melhor Pontuação</div>
+            <div className="text-xs text-blue-300">{t('stats.bestScore')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-indigo-800/20">
             <div className="text-2xl font-bold">{stats.totalGames}</div>
-            <div className="text-xs text-indigo-300">Jogos Jogados</div>
+            <div className="text-xs text-indigo-300">{t('stats.gamesPlayed')}</div>
           </div>
         </div>
         
         <h3 className="text-xl font-semibold mb-4 pb-2 border-b border-purple-700">
-          Suas Conquistas
+          {t('yourAchievements')}
         </h3>
         
         <div className="space-y-4">
@@ -112,8 +114,8 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
                 {achievement.icon}
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-lg">{achievement.title}</h4>
-                <p className="text-sm opacity-90">{achievement.description}</p>
+                <h4 className="font-bold text-lg">{t(`items.${achievement.id}.title`)}</h4>
+                <p className="text-sm opacity-90">{t(`items.${achievement.id}.description`)}</p>
                 {!achievement.unlocked && (
                   <div className="mt-2">
                     <div className="w-full bg-gray-700 rounded-full h-2 mt-1">
@@ -126,14 +128,14 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
                       ></div>
                     </div>
                     <div className="text-xs text-gray-400 mt-1">
-                      {stats.totalCorrectGuesses}/{achievement.requirement} acertos
+                      {stats.totalCorrectGuesses}/{achievement.requirement} {t('correctGuesses')}
                     </div>
                   </div>
                 )}
               </div>
               {achievement.unlocked && (
                 <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                  Desbloqueado!
+                  {t('unlocked')}
                 </div>
               )}
             </div>

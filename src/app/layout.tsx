@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { I18nProvider } from "./i18n/i18nContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,7 +44,9 @@ export default function RootLayout({
         <script defer data-domain="emoto.juliaklee.wtf" src="https://plausible.io/js/script.revenue.js"></script>
       </head>
       <body className={inter.className}>
-        {children}
+        <I18nProvider>
+          {children}
+        </I18nProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { stopAlarmSound } from '../utils/soundManager';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface HeaderProps {
   onHelpClick: () => void;
@@ -13,6 +14,8 @@ interface HeaderProps {
 
 export default function Header({ onHelpClick, onHomeClick, gameActive = false, onAchievementsClick }: HeaderProps) {
   const [isHovering, setIsHovering] = useState(false);
+  const { t } = useTranslation('header');
+  const { t: tGeneral } = useTranslation('general');
   
   const handleHomeClick = () => {
     stopAlarmSound();
@@ -29,7 +32,7 @@ export default function Header({ onHelpClick, onHomeClick, gameActive = false, o
           tabIndex={-1} 
           className="questionCircle fa fa-question-circle" 
           onClick={onHelpClick}
-          aria-label="Help"
+          aria-label={t('help')}
           style={{
             animation: 'pulse 3s infinite'
           }}
@@ -39,8 +42,8 @@ export default function Header({ onHelpClick, onHomeClick, gameActive = false, o
           tabIndex={-1} 
           className="trophyCircle fa fa-trophy" 
           onClick={onAchievementsClick}
-          aria-label="Achievements"
-          title="Ver Conquistas"
+          aria-label={t('achievements')}
+          title={t('achievements')}
           style={{
             animation: 'pulse 2s infinite alternate',
             position: 'fixed',
@@ -78,7 +81,7 @@ export default function Header({ onHelpClick, onHomeClick, gameActive = false, o
             color: 'white',
             textShadow: '2px 2px 3px rgba(0, 0, 0, 0.7)'
           }}>
-            Conquistas
+            {t('achievements')}
           </span>
         </a>
 
@@ -96,7 +99,7 @@ export default function Header({ onHelpClick, onHomeClick, gameActive = false, o
                 '6px 6px 5px black'
             }}
           >
-            emoto 2
+            {tGeneral('appName')} 2
           </h1>
           <h3 
             className="subtitle"
@@ -105,7 +108,7 @@ export default function Header({ onHelpClick, onHomeClick, gameActive = false, o
               animationDelay: '0.5s'
             }}
           >
-            um jogo sobre adivinhar emotes
+            {t('subtitle')}
           </h3>
           <p 
             className="version"
@@ -114,13 +117,13 @@ export default function Header({ onHelpClick, onHomeClick, gameActive = false, o
               animationDelay: '1s'
             }}
           >
-            v1.1.0 - Challenge Update
+            v1.1.0 - {t('challengeUpdate')}
           </p>
           {!gameActive && (
             <Image 
               className="peepoThink" 
               src="/img/3x.webp" 
-              alt="Thinking Emote" 
+              alt={t('thinkingEmoteAlt')} 
               width={96}
               height={96}
               priority

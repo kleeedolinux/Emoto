@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { stopAlarmSound } from '../utils/soundManager';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface WinDialogProps {
   isOpen: boolean;
@@ -14,6 +15,8 @@ interface WinDialogProps {
 export default function WinDialog({ isOpen, score, onHome, onShare }: WinDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [animateIn, setAnimateIn] = useState(false);
+  const { t } = useTranslation('win');
+  const { t: tGeneral } = useTranslation('general');
   
   useEffect(() => {
     if (isOpen && dialogRef.current && !dialogRef.current.open) {
@@ -184,7 +187,7 @@ export default function WinDialog({ isOpen, score, onHome, onShare }: WinDialogP
           <span style={{
             textShadow: '0 0 10px rgba(1,182,1,0.8), 0 0 20px rgba(1,182,1,0.4)'
           }}>
-            Você ganhou!
+            {t('congratulations')}
           </span>
           <span>
             <Image
@@ -261,7 +264,7 @@ export default function WinDialog({ isOpen, score, onHome, onShare }: WinDialogP
             textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
             textAlign: 'center'
           }}>
-            Pontuação
+            {t('score')}
           </p>
         </div>
         
@@ -281,7 +284,7 @@ export default function WinDialog({ isOpen, score, onHome, onShare }: WinDialogP
             onClick={onShare}
           >
             <i className="fa fa-share-alt" aria-hidden="true"></i>
-            <span>Compartilhar</span>
+            <span>{tGeneral('share')}</span>
           </button>
           
           <button 
@@ -289,7 +292,7 @@ export default function WinDialog({ isOpen, score, onHome, onShare }: WinDialogP
             onClick={handleHomeClick}
           >
             <i className="fa fa-home" aria-hidden="true"></i>
-            <span>Home</span>
+            <span>{tGeneral('home')}</span>
           </button>
         </div>
       </div>

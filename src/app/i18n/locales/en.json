@@ -1,0 +1,157 @@
+{
+  "general": {
+    "appName": "Emoto",
+    "record": "Record",
+    "submit": "Submit",
+    "retry": "Try Again",
+    "home": "Home",
+    "share": "Share",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "header": {
+    "help": "Help",
+    "achievements": "Achievements",
+    "subtitle": "a game about guessing emotes",
+    "challengeUpdate": "Challenge Update",
+    "thinkingEmoteAlt": "Thinking Emote"
+  },
+  "channelInput": {
+    "placeholder": "Enter Twitch channel",
+    "button": "Play",
+    "loading": "Loading...",
+    "invalid": "Invalid channel",
+    "error": "Error loading channel",
+    "challenges": {
+      "choose": "Choose a challenge",
+      "hide": "Hide",
+      "normal": "Normal",
+      "timed": "Against the Clock",
+      "blurred": "Blurred",
+      "timedBlurred": "Against the Clock + Blurred",
+      "oneLife": "One Life"
+    }
+  },
+  "game": {
+    "score": "Score",
+    "lives": "Lives",
+    "emoteGuess": "Guess the emote",
+    "inputPlaceholder": "Type emote name...",
+    "timeRemaining": "s"
+  },
+  "gameOver": {
+    "title": "Game Over!",
+    "score": "Your score",
+    "lastEmote": "The emote was",
+    "tryAgain": "Try Again",
+    "home": "Home",
+    "share": "Share",
+    "defeatMessage": "Defeated by the emote:",
+    "scoreMessages": {
+      "zero": "Try again, you can do it!",
+      "low": "Good start! Keep trying.",
+      "medium": "Very good! You're improving.",
+      "high": "Impressive! You know your emotes well.",
+      "excellent": "Amazing! You're an emote expert!"
+    }
+  },
+  "win": {
+    "title": "You win!",
+    "score": "Final score",
+    "home": "Home",
+    "share": "Share",
+    "congratulations": "You won!"
+  },
+  "emoteInput": {
+    "placeholder": "Enter emote name",
+    "correct": "Correct!",
+    "tryAgain": "Try again"
+  },
+  "footer": {
+    "by": "by",
+    "remake": "Remake by",
+    "altText": {
+      "twitch": "Twitch",
+      "youtube": "YouTube",
+      "twitter": "Twitter",
+      "github": "GitHub"
+    }
+  },
+  "help": {
+    "title": "How to Play",
+    "description": "Guess the Twitch emotes from your favorite streamer's channel.",
+    "instructions": [
+      "Enter a Twitch channel name → the game loads ALL emotes (BTTV + 7TV)",
+      "An emote appears",
+      "guess the name",
+      "Correct guess",
+      "You have 3 lives. Game over when you run out!"
+    ],
+    "howToPlay": "How to play",
+    "quickControls": "QUICK CONTROLS:",
+    "rules": "RULES:",
+    "gameDescription": "Emoto is a Twitch emote guessing game.",
+    "githubAlt": "GitHub",
+    "closeAlt": "Close",
+    "wrongGuess": "Wrong guess",
+    "streakBonus": "3 correct guesses in a row",
+    "extraLife": "extra life",
+    "gameOverCondition": "4 mistakes",
+    "gameOver": "GAME OVER",
+    "navigation": "navigate",
+    "jump": "jump",
+    "select": "select",
+    "cancel": "cancel"
+  },
+  "offline": {
+    "title": "You're Offline",
+    "description": "Please check your internet connection and try again."
+  },
+  "achievements": {
+    "title": "Achievements",
+    "yourAchievements": "Your Achievements",
+    "unlocked": "Unlocked!",
+    "correctGuesses": "correct guesses",
+    "stats": {
+      "totalCorrect": "Total Correct",
+      "bestScore": "Best Score",
+      "gamesPlayed": "Games Played"
+    },
+    "items": {
+      "tutorial": {
+        "title": "Metacritic",
+        "description": "Complete the tutorial"
+      },
+      "beginner": {
+        "title": "Beginner",
+        "description": "Guess 5 emotes correctly"
+      },
+      "intermediate": {
+        "title": "Emoter",
+        "description": "Guess 25 emotes correctly. You're getting the hang of it!"
+      },
+      "advanced": {
+        "title": "Enthusiast",
+        "description": "Guess 50 emotes. Emotes have no secrets from you!"
+      },
+      "expert": {
+        "title": "Expert",
+        "description": "Guess 100 emotes. Your skill is impressive!"
+      },
+      "master": {
+        "title": "Emote Master",
+        "description": "Guess 250 emotes. You're a legend in the emote world!"
+      },
+      "legend": {
+        "title": "Living Legend",
+        "description": "Guess 500 emotes. You've transcended the emote world!"
+      },
+      "immortal": {
+        "title": "Emote Immortal",
+        "description": "Guess 1000 emotes. You're an emote deity!"
+      }
+    }
+  }
+} 

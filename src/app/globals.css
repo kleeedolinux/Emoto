@@ -2403,3 +2403,185 @@ dialog:not([open])::backdrop {
 .error-popup.not_found {
   border-left: 4px solid #8be9fd;
 }
+
+/* Language Selector Styles */
+.language-selector {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  z-index: 100;
+  border-radius: 8px;
+  box-shadow: var(--shadow-soft);
+  background-color: rgba(32, 37, 43, 0.85);
+  border: 2px solid var(--color-primary);
+  overflow: visible;
+  transition: all 0.3s ease;
+  flex-direction: column;
+}
+
+.language-selector--footer {
+  position: relative;
+  top: auto;
+  right: auto;
+  margin: 0.5rem 0;
+}
+
+.language-selector:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 10px rgba(123, 57, 228, 0.5);
+}
+
+.language-display {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  width: 100%;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.language-display:hover {
+  background-color: rgba(123, 57, 228, 0.2);
+}
+
+.language-flag {
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.language-name {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.language-arrow {
+  margin-left: 10px;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.language-dropdown--open .language-arrow {
+  transform: rotate(180deg);
+}
+
+.language-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: rgba(32, 37, 43, 0.95);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 101;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease-out forwards;
+  transform-origin: top center;
+}
+
+.language-dropdown--footer {
+  top: auto;
+  bottom: 100%;
+  border-radius: 8px 8px 0 0;
+  transform-origin: bottom center;
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: optionFadeIn 0.3s ease-out forwards;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.language-option:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.language-option:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.language-option:hover {
+  background-color: rgba(123, 57, 228, 0.3);
+}
+
+.language-option--active {
+  background-color: rgba(123, 57, 228, 0.2);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.language-selector--minimal {
+  position: relative;
+  top: 0;
+  right: 0;
+  border-radius: 6px;
+  border: 1px solid var(--color-primary);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes optionFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .language-selector {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .language-name {
+    font-size: 13px;
+  }
+
+  .language-flag {
+    font-size: 14px;
+  }
+  
+  .language-display {
+    padding: 6px 10px;
+  }
+  
+  .language-option {
+    padding: 8px 10px;
+  }
+}
+
+.language-selector-container {
+	display: flex;
+	justify-content: center;
+	margin: 0.8rem 0;
+}
+
+.language-selector-container {
+	display: flex;
+	position: absolute;
+	top: 10px;
+	left: 15px;
+	margin: 0;
+}

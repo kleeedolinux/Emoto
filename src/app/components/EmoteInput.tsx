@@ -4,6 +4,7 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'rea
 import { useAutocomplete } from '../utils/useAutocomplete';
 import KeyboardNavigation from './KeyboardNavigation';
 import AutocompleteList from './AutocompleteList';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface EmoteInputProps {
   onEmoteGuess: (emote: string) => void;
@@ -18,6 +19,7 @@ export interface EmoteInputHandles {
 
 const EmoteInput = forwardRef<EmoteInputHandles, EmoteInputProps>(
   ({ onEmoteGuess, emotesList, isVisible }, ref) => {
+    const { t } = useTranslation('emoteInput');
     const [inputValue, setInputValue] = useState('');
     const [inputStatus, setInputStatus] = useState<'default' | 'correct' | 'incorrect'>('default');
     
@@ -37,12 +39,12 @@ const EmoteInput = forwardRef<EmoteInputHandles, EmoteInputProps>(
         setInputStatus('correct');
         
         if (inputRef.current) {
-          inputRef.current.placeholder = 'Acertou!';
+          inputRef.current.placeholder = t('correct');
           inputRef.current.blur();
           
           setTimeout(() => {
             if (inputRef.current) {
-              inputRef.current.placeholder = 'Insira o nome do emote';
+              inputRef.current.placeholder = t('placeholder');
               inputRef.current.focus();
               setInputStatus('default');
             }
@@ -58,13 +60,13 @@ const EmoteInput = forwardRef<EmoteInputHandles, EmoteInputProps>(
           void inputRef.current.offsetWidth;
           
           inputRef.current.className = 'emoteTry shake';
-          inputRef.current.placeholder = 'Tente novamente';
+          inputRef.current.placeholder = t('tryAgain');
           inputRef.current.blur();
           
           setTimeout(() => {
             if (inputRef.current) {
               inputRef.current.className = 'emoteTry';
-              inputRef.current.placeholder = 'Insira o nome do emote';
+              inputRef.current.placeholder = t('placeholder');
               inputRef.current.focus();
               setInputStatus('default');
             }
@@ -130,7 +132,7 @@ const EmoteInput = forwardRef<EmoteInputHandles, EmoteInputProps>(
           ref={inputRef}
           type="text"
           className="emoteTry"
-          placeholder="Insira o nome do emote"
+          placeholder={t('placeholder')}
           value={inputValue}
           onChange={handleChange}
           autoComplete="off"

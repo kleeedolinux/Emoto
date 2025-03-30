@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface HelpDialogProps {
   isOpen: boolean;
@@ -11,6 +12,9 @@ interface HelpDialogProps {
 export default function HelpDialog({ isOpen, onClose }: HelpDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [animateIn, setAnimateIn] = useState(false);
+  const { t } = useTranslation('help');
+  const { t: tGeneral } = useTranslation('general');
+  const { t: tGame } = useTranslation('game');
 
   useEffect(() => {
     if (isOpen && dialogRef.current && !dialogRef.current.open) {
@@ -35,7 +39,7 @@ export default function HelpDialog({ isOpen, onClose }: HelpDialogProps) {
   }, [isOpen]);
 
   const handleDialogClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-    // Only handle outside clicks
+  
     const dialogDimensions = dialogRef.current?.getBoundingClientRect();
     if (
       dialogDimensions &&
@@ -67,7 +71,7 @@ export default function HelpDialog({ isOpen, onClose }: HelpDialogProps) {
       }}
     >
       <div className="modalHelp">
-        <h1 className="modalTitle">Como jogar</h1>
+        <h1 className="modalTitle">{t('howToPlay')}</h1>
         <Image 
           className="gaming" 
           src="/img/hate.webp" 
@@ -77,39 +81,40 @@ export default function HelpDialog({ isOpen, onClose }: HelpDialogProps) {
           unoptimized
         />
         <p className="modalText">
-          Emoto é um jogo de adivinhação de emotes da Twitch.
+          {t('gameDescription')}
           <br/><br/>
-          <strong>COMO JOGAR:</strong>
+          <strong>{t('howToPlay')}:</strong>
           <br/>
-          1. Insira o nome do canal → o jogo carrega TODOS os emotes (BTTV + 7TV).
+          1. {t('instructions.0')}
           <br/>
-          2. Um emote aparece → <strong>adivinhe o nome dele</strong>.
+          2. {t('instructions.1')} → <strong>{t('instructions.2')}</strong>.
           <br/><br/>
-          <strong>REGRAS:</strong>
+          <strong>{t('rules')}:</strong>
           <br/>
-          ✅ Acertou = <strong>+1 ponto</strong> (emote é removido).
+          ✅ {t('instructions.3')} = <strong>+1 {tGame('score').toLowerCase()}</strong>.
           <br/>
-          ❌ Errou = <strong>-1 vida</strong> (tente de novo).
+          ❌ {t('wrongGuess')} = <strong>-1 {tGame('lives').toLowerCase()}</strong>.
           <br/>
-          🔥 3 acertos seguidos = <strong>+1 vida extra</strong>.
+          🔥 {t('streakBonus')} = <strong>+1 {t('extraLife')}</strong>.
           <br/>
-          💀 4 erros = <strong>FIM DO JOGO</strong>.
+          💀 {t('gameOverCondition')} = <strong>{t('gameOver')}</strong>.
           <br/><br/>
-          <strong>CONTROLES RÁPIDOS:</strong>
+          <strong>{t('quickControls')}</strong>
           <br/>
-          ↑/↓ = navega | Ctrl+Home/End = salto | Enter = seleciona | Esc = cancela
+          ↑/↓ = {t('navigation')} | Ctrl+Home/End = {t('jump')} | Enter = {t('select')} | Esc = {t('cancel')}
         </p>
         <button 
           onClick={handleCloseButtonClick} 
           className="modalCloseButton fa fa-close"
           type="button"
-          aria-label="Close"
+          aria-label={tGeneral('close')}
         ></button>
         <a 
           target="_blank" 
           href="https://github.com/Kleeedolinux/Emoto" 
           className="github fa fa-github"
           rel="noopener noreferrer"
+          aria-label={t('githubAlt')}
         ></a>
       </div>
     </dialog>
