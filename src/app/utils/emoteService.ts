@@ -7,10 +7,10 @@ const API_ENDPOINT = 'https://emotes.crippled.dev/v1/channel';
 const CACHE_EXPIRY = 1000 * 60 * 60; 
 const REQUEST_TIMEOUT = 5000;
 const PRELOAD_BATCH_SIZE = 5;
-const MAX_CONSECUTIVE_GUESSES = 5;
+const MAX_CONSECUTIVE_GUESSES = 900;
 const GUESS_COOLDOWN_MS = 1500;
 
-export const DEBUG_MODE = false;
+export const DEBUG_MODE = true;
 
 let emoteCache: Map<string, {
   timestamp: number;
