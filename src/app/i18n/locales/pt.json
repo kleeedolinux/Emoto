@@ -121,6 +121,7 @@
     "correctGuesses": "acertos",
     "stats": {
       "totalCorrect": "Acertos Totais",
+      "uniqueCorrect": "Emotes Únicos",
       "bestScore": "Melhor Pontuação",
       "gamesPlayed": "Jogos Jogados"
     },

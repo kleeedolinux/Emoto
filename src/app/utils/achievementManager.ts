@@ -3,6 +3,7 @@
 import { Achievement, AchievementData } from '../types';
 
 const STORAGE_KEY = 'emoto_achievement_data';
+const EMOTES_STORAGE_KEY = 'emoto_guessed_emotes';
 
 const O_INCIDENTE_CHANNELS = ['cereaw', 'grifoexe', 'eo_chara', 'tinymigs', 'akkaiverso'];
 
@@ -95,6 +96,7 @@ const DEFAULT_ACHIEVEMENT_DATA: AchievementData = {
   achievements: DEFAULT_ACHIEVEMENTS,
   stats: {
     totalCorrectGuesses: 0,
+    uniqueCorrectGuesses: 0,
     bestScore: 0,
     totalGames: 0,
     channelGuesses: {},
@@ -121,7 +123,6 @@ export function getAchievementData(): AchievementData {
 
   try {
     if (!isLocalStorageAvailable()) {
-      console.warn('localStorage is not available.');
       return DEFAULT_ACHIEVEMENT_DATA;
     }
     
@@ -143,47 +144,18 @@ export function getAchievementData(): AchievementData {
     const filteredAchievements = parsedData.achievements
       .filter(a => defaultAchievementIds.includes(a.id));
     
-    let needsMigration = false;
-    if (!parsedData.stats.guessedEmotes) {
-      parsedData.stats.guessedEmotes = {};
-      needsMigration = true;
-    } else if (!parsedData.stats.guessedEmotes['all']) {
-      needsMigration = true;
-    }
-    
     const needsUpdate = achievementsToAdd.length > 0 || 
-                        filteredAchievements.length !== parsedData.achievements.length ||
-                        needsMigration;
+                        filteredAchievements.length !== parsedData.achievements.length;
     
     if (needsUpdate) {
       const updatedAchievements = [...filteredAchievements, ...achievementsToAdd];
-      
-      let migratedGuessedEmotes: Record<string, string[]> = { 
-        all: [] 
-      };
-      
-      if (parsedData.stats.guessedEmotes && needsMigration) {
-        for (const channelKey in parsedData.stats.guessedEmotes) {
-          if (channelKey === 'all') continue;
-          
-          const emotes = parsedData.stats.guessedEmotes[channelKey];
-          if (Array.isArray(emotes)) {
-            for (const emoteName of emotes) {
-              migratedGuessedEmotes.all.push(`${channelKey}:${emoteName}`);
-            }
-          }
-        }
-      } else if (parsedData.stats.guessedEmotes) {
-        migratedGuessedEmotes = parsedData.stats.guessedEmotes;
-      }
       
       const updatedData = {
         ...parsedData,
         achievements: updatedAchievements,
         stats: {
           ...DEFAULT_ACHIEVEMENT_DATA.stats,
-          ...parsedData.stats,
-          guessedEmotes: migratedGuessedEmotes
+          ...parsedData.stats
         }
       };
       
@@ -212,137 +184,206 @@ export function saveAchievementData(data: Partial<AchievementData>): void {
 
   try {
     if (!isLocalStorageAvailable()) {
-      console.warn('localStorage is not available, cannot save achievement data.');
       return;
     }
     
     const currentData = getAchievementData();
     
-    const updatedStats = {
-      ...currentData.stats,
-      ...(data.stats || {})
-    };
+    const finalData: AchievementData = JSON.parse(JSON.stringify(currentData));
     
-    if (data.stats?.guessedEmotes) {
-      updatedStats.guessedEmotes = {
-        ...currentData.stats.guessedEmotes,
-        ...data.stats.guessedEmotes
-      };
+    if (data.achievements) {
+      finalData.achievements = data.achievements;
     }
     
-    const updatedData = { 
-      ...currentData, 
-      ...data,
-      stats: updatedStats
-    };
+    if (data.stats) {
+      if (data.stats.totalCorrectGuesses !== undefined) 
+        finalData.stats.totalCorrectGuesses = data.stats.totalCorrectGuesses;
+      
+      if (data.stats.bestScore !== undefined) 
+        finalData.stats.bestScore = data.stats.bestScore;
+      
+      if (data.stats.totalGames !== undefined) 
+        finalData.stats.totalGames = data.stats.totalGames;
+      
+      if (data.stats.channelGuesses) {
+        finalData.stats.channelGuesses = {
+          ...finalData.stats.channelGuesses,
+          ...data.stats.channelGuesses
+        };
+      }
+    }
     
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(finalData));
   } catch (error) {
-    console.error('Error saving achievement data to localStorage:', error);
+    console.error('Error saving achievement data:', error);
   }
 }
 
-export function incrementCorrectGuesses(): Achievement[] {
+export function incrementCorrectGuesses(channel?: string, emoteName?: string): Achievement[] {
   const data = getAchievementData();
+  let newlyUnlocked: Achievement[] = [];
+  
   const totalCorrectGuesses = data.stats.totalCorrectGuesses + 1;
   
-  const updatedAchievements = data.achievements.map(achievement => {
-    if (!achievement.unlocked && 
-        !achievement.channels && 
-        totalCorrectGuesses >= achievement.requirement) {
-      return { ...achievement, unlocked: true };
-    }
-    return achievement;
-  });
+  let uniqueCorrectGuesses = data.stats.uniqueCorrectGuesses || 0;
+  let countedAsUnique = false;
   
-  const newlyUnlocked = updatedAchievements.filter((achievement, index) => 
-    achievement.unlocked && !data.achievements[index].unlocked
-  );
-  
-  saveAchievementData({
-    achievements: updatedAchievements,
-    stats: {
-      ...data.stats,
-      totalCorrectGuesses
-    }
-  });
+  if (channel && emoteName && !hasGuessedEmote(channel, emoteName)) {
+    uniqueCorrectGuesses++;
+    countedAsUnique = true;
+    
+    const updatedAchievements = data.achievements.map(achievement => {
+      if (!achievement.unlocked && 
+          !achievement.channels && 
+          uniqueCorrectGuesses >= achievement.requirement) {
+        return { ...achievement, unlocked: true };
+      }
+      return achievement;
+    });
+    
+    newlyUnlocked = updatedAchievements.filter((achievement, index) => 
+      achievement.unlocked && !data.achievements[index].unlocked
+    );
+    
+    saveAchievementData({
+      achievements: updatedAchievements,
+      stats: {
+        ...data.stats,
+        totalCorrectGuesses,
+        uniqueCorrectGuesses
+      }
+    });
+    
+    saveGuessedEmote(channel, emoteName);
+  } else {
+    saveAchievementData({
+      stats: {
+        ...data.stats,
+        totalCorrectGuesses
+      }
+    });
+  }
   
   return newlyUnlocked;
+}
+
+export function hasGuessedEmote(channel: string, emoteName: string): boolean {
+  if (typeof window === 'undefined' || !isLocalStorageAvailable() || !channel || !emoteName) {
+    return false;
+  }
+
+  try {
+    const storedData = localStorage.getItem(EMOTES_STORAGE_KEY);
+    if (!storedData) return false;
+
+    const guessedEmotes = JSON.parse(storedData);
+    const lowerChannel = channel.toLowerCase();
+    return guessedEmotes[lowerChannel]?.includes(emoteName) || false;
+  } catch (error) {
+    console.error('Error checking guessed emote:', error);
+    return false;
+  }
+}
+
+export function saveGuessedEmote(channel: string, emoteName: string): void {
+  if (typeof window === 'undefined' || !isLocalStorageAvailable()) {
+    return;
+  }
+
+  try {
+    const lowerChannel = channel.toLowerCase();
+    let guessedEmotes: Record<string, string[]> = {};
+    
+    const storedData = localStorage.getItem(EMOTES_STORAGE_KEY);
+    if (storedData) {
+      guessedEmotes = JSON.parse(storedData);
+    }
+    
+    if (!guessedEmotes[lowerChannel]) {
+      guessedEmotes[lowerChannel] = [];
+    }
+    
+    if (!guessedEmotes[lowerChannel].includes(emoteName)) {
+      guessedEmotes[lowerChannel].push(emoteName);
+      localStorage.setItem(EMOTES_STORAGE_KEY, JSON.stringify(guessedEmotes));
+      console.log(`Saved emote ${emoteName} for channel ${lowerChannel}`, guessedEmotes);
+    }
+  } catch (error) {
+    console.error('Error saving guessed emote:', error);
+  }
 }
 
 export function incrementChannelGuess(channel: string, emoteName: string): Achievement[] {
-  const data = getAchievementData();
+  if (!channel || !emoteName || typeof window === 'undefined') {
+    return [];
+  }
+
   const lowerCaseChannel = channel.toLowerCase();
   
-  if (!data.stats.channelGuesses) {
-    data.stats.channelGuesses = {};
+  if (hasGuessedEmote(lowerCaseChannel, emoteName)) {
+    return [];
   }
-  
-  if (!data.stats.guessedEmotes) {
-    data.stats.guessedEmotes = {};
-  }
-  
-  let shouldIncrementChannel = false;
-  for (const achievement of data.achievements) {
-    if (achievement.channels && achievement.channels.includes(lowerCaseChannel)) {
-      shouldIncrementChannel = true;
-      break;
+
+  try {
+    saveGuessedEmote(lowerCaseChannel, emoteName);
+    
+    const data = getAchievementData();
+    
+    if (!data.stats.channelGuesses) {
+      data.stats.channelGuesses = {};
     }
-  }
-  
-  if (!shouldIncrementChannel) {
-    return [];
-  }
-  
-  const emoteKey = `${lowerCaseChannel}:${emoteName}`;
-  
-  if (!data.stats.guessedEmotes['all']) {
-    data.stats.guessedEmotes['all'] = [];
-  }
-  
-  if (data.stats.guessedEmotes['all'].includes(emoteKey)) {
-    return [];
-  }
-  
-  const updatedGuessedEmotes = {
-    ...data.stats.guessedEmotes,
-    all: [...data.stats.guessedEmotes['all'], emoteKey]
-  };
-  
-  const channelGuesses = {
-    ...data.stats.channelGuesses,
-    [lowerCaseChannel]: (data.stats.channelGuesses?.[lowerCaseChannel] || 0) + 1
-  };
-  
-  const updatedAchievements = data.achievements.map(achievement => {
-    if (!achievement.unlocked && achievement.channels) {
-      if (achievement.channels.includes(lowerCaseChannel)) {
-        const totalRelevantGuesses = achievement.channels.reduce((total, ch) => {
-          return total + (channelGuesses[ch.toLowerCase()] || 0);
-        }, 0);
-        
-        if (totalRelevantGuesses >= achievement.requirement) {
-          return { ...achievement, unlocked: true };
-        }
+    
+    let channelIsRelevant = false;
+    for (const achievement of data.achievements) {
+      if (achievement.channels && achievement.channels.includes(lowerCaseChannel)) {
+        channelIsRelevant = true;
+        break;
       }
     }
-    return achievement;
-  });
-  
-  const newlyUnlocked = updatedAchievements.filter((achievement, index) => 
-    achievement.unlocked && !data.achievements[index].unlocked
-  );
-  
-  saveAchievementData({
-    achievements: updatedAchievements,
-    stats: {
-      ...data.stats,
-      channelGuesses,
-      guessedEmotes: updatedGuessedEmotes
+    
+    if (!channelIsRelevant) {
+      return [];
     }
-  });
-  
-  return newlyUnlocked;
+    
+    const updatedCount = (data.stats.channelGuesses[lowerCaseChannel] || 0) + 1;
+    
+    const updatedChannelGuesses = {
+      ...data.stats.channelGuesses,
+      [lowerCaseChannel]: updatedCount
+    };
+    
+    const updatedAchievements = data.achievements.map(achievement => {
+      if (!achievement.unlocked && achievement.channels) {
+        if (achievement.channels.includes(lowerCaseChannel)) {
+          const totalRelevantGuesses = achievement.channels.reduce((total, ch) => {
+            return total + (updatedChannelGuesses[ch.toLowerCase()] || 0);
+          }, 0);
+          
+          if (totalRelevantGuesses >= achievement.requirement) {
+            return { ...achievement, unlocked: true };
+          }
+        }
+      }
+      return achievement;
+    });
+    
+    const newlyUnlocked = updatedAchievements.filter((achievement, index) => 
+      achievement.unlocked && !data.achievements[index].unlocked
+    );
+    
+    saveAchievementData({
+      achievements: updatedAchievements,
+      stats: {
+        ...data.stats,
+        channelGuesses: updatedChannelGuesses
+      }
+    });
+    
+    return newlyUnlocked;
+  } catch (error) {
+    console.error('Error in incrementChannelGuess:', error);
+    return [];
+  }
 }
 
 export function updateBestScore(score: number): void {
@@ -389,7 +430,44 @@ export function useAchievementManager() {
   };
   
   const getStats = () => {
-    return getAchievementData().stats;
+    const stats = getAchievementData().stats;
+    
+    let uniqueCount = 0;
+    if (typeof window !== 'undefined' && isLocalStorageAvailable()) {
+      try {
+        const stored = localStorage.getItem(EMOTES_STORAGE_KEY);
+        if (stored) {
+          const guessedEmotes = JSON.parse(stored);
+          Object.values(guessedEmotes).forEach((emotes: any) => {
+            uniqueCount += (emotes as any[]).length;
+          });
+        }
+      } catch (e) {
+        console.error('Error calculating unique emotes:', e);
+      }
+    }
+    
+    return {
+      ...stats,
+      uniqueCorrectGuesses: stats.uniqueCorrectGuesses || uniqueCount
+    };
+  };
+  
+  const getGuessedEmotes = (): Record<string, string[]> => {
+    if (typeof window === 'undefined' || !isLocalStorageAvailable()) {
+      return {};
+    }
+    
+    try {
+      const stored = localStorage.getItem(EMOTES_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error('Error retrieving guessed emotes:', e);
+    }
+    
+    return {};
   };
   
   return {
@@ -399,6 +477,7 @@ export function useAchievementManager() {
     incrementTotalGames,
     getUnlockedAchievements,
     getAllAchievements,
-    getStats
+    getStats,
+    getGuessedEmotes
   };
 } 

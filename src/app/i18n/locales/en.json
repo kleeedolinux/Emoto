@@ -121,6 +121,7 @@
     "correctGuesses": "correct guesses",
     "stats": {
       "totalCorrect": "Total Correct",
+      "uniqueCorrect": "Unique Emotes",
       "bestScore": "Best Score",
       "gamesPlayed": "Games Played"
     },

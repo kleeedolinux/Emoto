@@ -6,10 +6,11 @@ import { useLivesManager } from '../utils/livesManager';
 import { useModalManager } from '../utils/modalManager';
 import { fetchEmotes, getRandomEmote, checkGuess, getEmoteNames, removeEmote, EmoteResponse } from '../utils/emoteService';
 import { playSound, startAlarmSound, stopAlarmSound, testAlarm } from '../utils/soundManager';
-import { Emote, Achievement } from '../types';
+import { Achievement } from '../types/index';
 import { EmoteInputHandles } from './EmoteInput';
 import { incrementCorrectGuesses, incrementChannelGuess, incrementTotalGames, updateBestScore } from '../utils/achievementManager';
 import { ErrorType } from './ErrorPopup';
+import { Emote } from '../types/index';
 
 interface GameControllerProps {
   children: (props: GameControllerOutput) => React.ReactNode;

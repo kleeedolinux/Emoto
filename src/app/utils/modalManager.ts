@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { ModalState } from '../types';
+import { ModalState } from '../types/index';
 
 export function useModalManager() {
   const [modalState, setModalState] = useState<ModalState>({

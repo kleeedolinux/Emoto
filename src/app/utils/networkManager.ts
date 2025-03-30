@@ -1,6 +1,5 @@
 export type NetworkStatus = 'online' | 'offline' | 'unknown';
 
-// Singleton to keep track of the network status across the app
 class NetworkManager {
   private static instance: NetworkManager;
   private status: NetworkStatus = 'unknown';
@@ -8,10 +7,8 @@ class NetworkManager {
 
   private constructor() {
     if (typeof window !== 'undefined') {
-      // Initialize with current status
       this.status = navigator.onLine ? 'online' : 'offline';
       
-      // Add event listeners
       window.addEventListener('online', this.handleOnline);
       window.addEventListener('offline', this.handleOffline);
     }
@@ -45,7 +42,6 @@ class NetworkManager {
 
   public addStatusChangeListener(callback: (status: NetworkStatus) => void) {
     this.listeners.push(callback);
-    // Immediately call with current status
     callback(this.status);
     return () => this.removeStatusChangeListener(callback);
   }
@@ -69,7 +65,6 @@ class NetworkManager {
 
 export const networkManager = NetworkManager.getInstance();
 
-// React hook for network status
 export function useNetworkStatus(): NetworkStatus {
   if (typeof window === 'undefined') {
     return 'unknown';
@@ -87,5 +82,4 @@ export function useNetworkStatus(): NetworkStatus {
   return status;
 }
 
-// Add missing import
 import { useState, useEffect } from 'react'; 

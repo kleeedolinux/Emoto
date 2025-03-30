@@ -35,6 +35,7 @@ export interface AchievementData {
   achievements: Achievement[];
   stats: {
     totalCorrectGuesses: number;
+    uniqueCorrectGuesses: number;
     bestScore: number;
     totalGames: number;
     channelGuesses?: Record<string, number>;

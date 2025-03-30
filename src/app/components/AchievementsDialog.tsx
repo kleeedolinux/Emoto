@@ -17,6 +17,7 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [stats, setStats] = useState({
     totalCorrectGuesses: 0,
+    uniqueCorrectGuesses: 0,
     bestScore: 0,
     totalGames: 0,
     channelGuesses: {} as Record<string, number>
@@ -28,6 +29,7 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
       setAchievements(getAllAchievements());
       const achievementStats = getStats();
       const recordScore = getStoredRecordScore();
+      
       setStats({
         ...achievementStats,
         bestScore: recordScore,
@@ -83,12 +85,16 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
           </button>
         </div>
         
-        <div className="mb-8 bg-indigo-800/30 p-4 rounded-lg grid grid-cols-3 gap-4 shadow-inner"
+        <div className="mb-8 bg-indigo-800/30 p-4 rounded-lg grid grid-cols-4 gap-4 shadow-inner"
           style={{ boxShadow: 'inset 0 0 15px rgba(0, 0, 0, 0.3)' }}
         >
           <div className="text-center p-2 rounded-lg bg-purple-800/20">
             <div className="text-2xl font-bold">{stats.totalCorrectGuesses}</div>
             <div className="text-xs text-purple-300">{t('stats.totalCorrect')}</div>
+          </div>
+          <div className="text-center p-2 rounded-lg bg-indigo-800/20">
+            <div className="text-2xl font-bold">{stats.uniqueCorrectGuesses}</div>
+            <div className="text-xs text-indigo-300">{t('stats.uniqueCorrect')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-blue-800/20">
             <div className="text-2xl font-bold">{stats.bestScore}</div>
@@ -141,7 +147,7 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
                         style={{ 
                           width: `${Math.min(100, (achievement.channels 
                             ? calculateChannelProgress(achievement, stats.channelGuesses)
-                            : (stats.totalCorrectGuesses / achievement.requirement)) * 100)}%`,
+                            : (stats.uniqueCorrectGuesses / achievement.requirement)) * 100)}%`,
                           transition: 'width 1s ease-in-out'
                         }}
                       ></div>
@@ -149,7 +155,7 @@ export default function AchievementsDialog({ isOpen, onClose }: AchievementsDial
                     <div className="text-xs text-gray-400 mt-1">
                       {achievement.channels 
                         ? `${calculateChannelTotal(achievement, stats.channelGuesses)}/${achievement.requirement} ${t('correctGuesses')}`
-                        : `${stats.totalCorrectGuesses}/${achievement.requirement} ${t('correctGuesses')}`}
+                        : `${stats.uniqueCorrectGuesses}/${achievement.requirement} ${t('correctGuesses')}`}
                     </div>
                   </div>
                 )}
