@@ -76,7 +76,7 @@ const DEFAULT_ACHIEVEMENTS: Achievement[] = [
     title: 'O Incidente',
     description: 'Adivinhe 15 emotes dos canais do grupo O Incidente (cereaw, grifoexe, eo_chara, tinymigs, akkaiverso)',
     requirement: 15,
-    icon: '👻',
+    icon: '💀',
     unlocked: false,
     channels: O_INCIDENTE_CHANNELS
   }
