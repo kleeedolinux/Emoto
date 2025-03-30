@@ -79,6 +79,15 @@ const DEFAULT_ACHIEVEMENTS: Achievement[] = [
     icon: '💀',
     unlocked: false,
     channels: O_INCIDENTE_CHANNELS
+  },
+  {
+    id: 'to_chapando',
+    title: 'Ou eu tô chapando e você quer meu fim?	',
+    description: 'Adivinhe 100 emotes dos canais do grupo O Incidente (cereaw, grifoexe, eo_chara, tinymigs, akkaiverso)',
+    requirement: 100,
+    icon: '💀',
+    unlocked: false,
+    channels: O_INCIDENTE_CHANNELS
   }
 ];
 

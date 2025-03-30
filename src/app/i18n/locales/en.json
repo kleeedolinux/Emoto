@@ -160,6 +160,10 @@
       "o_incidente": {
         "title": "O Incidente",
         "description": "Guess 15 emotes from O Incidente group channels (cereaw, grifoexe, eo_chara, tinymigs, akkaiverso)"
+      },
+      "to_chapando": {
+        "title": "Ou eu tô chapando e você quer meu fim?",
+        "description": "Guess 100 emotes from O Incidente group channels (cereaw, grifoexe, eo_chara, tinymigs, akkaiverso)"
       }
     }
   }

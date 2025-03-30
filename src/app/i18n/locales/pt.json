@@ -160,6 +160,10 @@
       "o_incidente": {
         "title": "O Incidente",
         "description": "Adivinhe 15 emotes do grupo O Incidente (cereaw, grifoexe, eo_chara, tinymigs, akkaiverso)"
+      },
+      "to_chapando": {
+        "title": "Ou eu tô chapando e você quer meu fim?",
+        "description": "Adivinhe 100 emotes do grupo O Incidente (cereaw, grifoexe, eo_chara, tinymigs, akkaiverso)"
       }
     }
   }
