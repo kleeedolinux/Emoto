@@ -255,6 +255,13 @@ export function incrementCorrectGuesses(channel?: string, emoteName?: string): A
     });
     
     saveGuessedEmote(channel, emoteName);
+
+    if (channel) {
+      const channelAchievements = incrementChannelGuess(channel, emoteName, true);
+      if (channelAchievements.length > 0) {
+        newlyUnlocked = [...newlyUnlocked, ...channelAchievements];
+      }
+    }
   } else {
     saveAchievementData({
       stats: {
@@ -313,7 +320,7 @@ export function saveGuessedEmote(channel: string, emoteName: string): void {
   }
 }
 
-export function incrementChannelGuess(channel: string, emoteName: string): Achievement[] {
+export function incrementChannelGuess(channel: string, emoteName: string, skipSaveEmote: boolean = false): Achievement[] {
   if (!channel || !emoteName || typeof window === 'undefined') {
     return [];
   }
@@ -325,7 +332,9 @@ export function incrementChannelGuess(channel: string, emoteName: string): Achie
   }
 
   try {
-    saveGuessedEmote(lowerCaseChannel, emoteName);
+    if (!skipSaveEmote) {
+      saveGuessedEmote(lowerCaseChannel, emoteName);
+    }
     
     const data = getAchievementData();
     
